@@ -105,7 +105,7 @@ void send_buf(struct ctx *ctx, struct sockaddr_in addr, struct buf *sbuf,
     int n = sendto(ctx->cfd, sbuf->data, sbuf->len, 0, (struct sockaddr *)&addr,
                    sizeof(struct sockaddr_in));
 
-    if (n < 0) log_warn("send => an error occurred, skipping..");
+    if (n < 0) log_warn("send => an error = %d occurred, skipping..", n);
 
     log_debug("flush %d bytes =>  %s", n, addr_s);
 
