@@ -13,19 +13,28 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h> /*for signal() and raise()*/
 
 #include "log.h"
 #include "proxy.h"
 
 #include "config.h"
 
-#define STATSD_PROXY_VERSION "0.1.0"
+#define STATSD_PROXY_VERSION "0.1.1"
 
 void version(void);
 void usage(void);
 void start(struct config *config);
 
+/*ipc_signal.c*/
+void signal_handler(){
+  printf("Handle stop signal!\n #TODO add close all threads and exit");
+
+}
+
 int main(int argc, char *argv[]) {
+
+    signal(SIGINT, signal_handler);
     log_open("statsd-proxy", NULL, 0);
 
     char *filename;
