@@ -6,6 +6,7 @@
 #include <arpa/inet.h>
 #include <assert.h>
 #include <errno.h>
+#include <netdb.h>
 #include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -119,6 +120,31 @@ void ctx_free(struct ctx *ctx) {
     }
 }
 
+struct sockaddr_in *resolve(char *hostname) {
+    int sockfd;
+    struct addrinfo hints, *servinfo, *p;
+    struct sockaddr_in *h;
+    int rv;
+
+    memset(&hints, 0, sizeof hints);
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+
+    if ((rv = getaddrinfo(hostname, "http", &hints, &servinfo)) != 0) {
+        log_error("getaddrinfo: %s\n", gai_strerror(rv));
+        return NULL;
+    }
+
+    for (p = servinfo; p != NULL; p = p->ai_next) {
+        h = (struct sockaddr_in *)p->ai_addr;
+        log_debug("%s resolved to: %s\n", hostname, inet_ntoa(h->sin_addr));
+        // break;
+    }
+
+    freeaddrinfo(servinfo);
+    return h;
+}
+
 /* Init ctx, init addrs and client/sockets */
 int ctx_init(struct ctx *ctx) {
     assert(ctx != NULL);
@@ -141,7 +167,7 @@ int ctx_init(struct ctx *ctx) {
 
         bzero(&addrs[i], sizeof(struct sockaddr_in));
         addrs[i].sin_family = AF_INET;
-        addrs[i].sin_addr.s_addr = inet_addr(bhost);
+        addrs[i].sin_addr = (resolve(bhost))->sin_addr;
         addrs[i].sin_port = htons(bport);
     }
 
