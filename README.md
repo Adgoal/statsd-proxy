@@ -1,6 +1,10 @@
 Statsd-Proxy
 ============
 
+[![Build Status](https://travis-ci.org/Adgoal/statsd-proxy.svg?branch=master)](https://travis-ci.org/Adgoal/statsd-proxy)
+![Docker Pulls](https://img.shields.io/docker/pulls/adgoal/statsd-proxy)
+![GitHub](https://img.shields.io/github/license/adgoal/statsd-proxy)
+
 Proxy for [etsy/statsd](https://github.com/etsy/statsd).
 
 Why
@@ -58,6 +62,14 @@ Usage
       -d, --debug       Enable debug logging
     Copyright (c) https://github.com/hit9/statsd-proxy
 
+In Docker image use env var
+```text
+STATSD_PORXY_PORT=9125
+STATSD_PORXY_NUM_THREADS=4
+STATSD_PORXY_FLUSH_INTERVAL=10 #ms
+STATSD_PORXY_SOCKET_RECEIVE_BUFSIZE=106496
+STATSD_PORXY_NODES="node1:9125,node2:9125,node3:9125"
+```
 License
 -------
 
