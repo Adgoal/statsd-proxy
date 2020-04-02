@@ -1,0 +1,14 @@
+version: "3.7"
+
+services:
+
+  statsd:
+    build:
+      dockerfile: ./.docker/Dockerfile
+      context: .
+    stop_signal: SIGINT
+    environment:
+      STATSD_PORXY_FLUSH_INTERVAL: 1000
+      STATSD_PORXY_NODES: "prometheus.adgoaltech.net:8126"
+
+

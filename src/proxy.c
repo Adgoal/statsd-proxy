@@ -19,9 +19,11 @@
 /* Start proxy in a thread. */
 void *thread_start(void *arg) {
     struct ctx *ctx = arg;
-    int err = -1;
+    int err = ctx_init(ctx);
 
-    if ((err = ctx_init(ctx)) == CTX_OK) err = server_start(ctx);
+    if (err == CTX_OK){
+        err = server_start(ctx);
+    }
 
     switch (err) {
         case PROXY_ENOMEM:
@@ -77,8 +79,9 @@ int server_start(struct ctx *ctx) {
     addr.sin_addr.s_addr = htonl(INADDR_ANY);
     addr.sin_port = htons(ctx->port);
 
-    if (bind(ctx->sfd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+    if (bind(ctx->sfd, (struct sockaddr *)&addr, sizeof(addr)) < 0){
         return PROXY_EBIND;
+    }
 
     log_info("serving on udp://127.0.0.1:%d..", ctx->port);
 
@@ -94,16 +97,14 @@ int server_start(struct ctx *ctx) {
 }
 
 /* Util to send buf to addr */
-void send_buf(struct ctx *ctx, struct sockaddr_in addr, struct buf *sbuf,
-              char *addr_s) {
+void send_buf(struct ctx *ctx, struct sockaddr_in addr, struct buf *sbuf, char *addr_s) {
     assert(ctx != NULL);
     assert(sbuf != NULL);
 
     // trim the last \n
     if (sbuf->len > 0 && sbuf->data[sbuf->len - 1] == '\n') sbuf->len -= 1;
 
-    int n = sendto(ctx->cfd, sbuf->data, sbuf->len, 0, (struct sockaddr *)&addr,
-                   sizeof(struct sockaddr_in));
+    int n = sendto(ctx->cfd, sbuf->data, sbuf->len, 0, (struct sockaddr *)&addr, sizeof(struct sockaddr_in));
 
     if (n < 0) log_warn("send => an error = %d occurred, skipping..", n);
 
@@ -169,6 +170,8 @@ void flush_buf(struct event_loop *loop, int id, void *data) {
         sbuf = ctx->sbufs[i];
         addr = ctx->addrs[i];
         node = &(ctx->nodes[i]);
-        if (sbuf->len > 0) send_buf(ctx, addr, sbuf, node->key);
+        if (sbuf->len > 0) {
+            send_buf(ctx, addr, sbuf, node->key);
+        }
     }
 }

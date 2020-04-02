@@ -114,9 +114,17 @@ void start(struct config *config) {
     int i;
 
     for (i = 0; i < config->num_threads; i++) {
-        if ((ctxs[i] = ctx_new(config->nodes, config->num_nodes, config->port,
-                               config->flush_interval, config->socket_receive_bufsize)) == NULL)
+        if (
+                (ctxs[i] = ctx_new(
+                config->nodes,
+                config->num_nodes,
+                config->port,
+                config->flush_interval,
+                config->socket_receive_bufsize)
+                        ) == NULL
+        ) {
             exit(1);
+        }
         pthread_create(&threads[i], NULL, &thread_start, ctxs[i]);
     }
 

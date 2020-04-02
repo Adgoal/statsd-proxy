@@ -155,15 +155,13 @@ int ctx_init(struct ctx *ctx) {
     struct sockaddr_in *addrs = ctx->addrs;
     int i;
     unsigned short bport = 8125;
-    char bhost[17] = {0}; /* 255.255.255.255 (15) */
+    char bhost[50] = {0}; /* 255.255.255.255 (15) */
     struct ketama_node *nodes = ctx->nodes;
 
     for (i = 0; i < ctx->num_nodes; i++) {
-        if (strlen(nodes[i].key) > 26) /* 15 + 10 + 1 = 26 */
+        if (sscanf(nodes[i].key, "%[^:]:%hu", bhost, &bport) != 2){
             return CTX_EBADFMT;
-
-        if (sscanf(nodes[i].key, "%[^:]:%hu", bhost, &bport) != 2)
-            return CTX_EBADFMT;
+        }
 
         bzero(&addrs[i], sizeof(struct sockaddr_in));
         addrs[i].sin_family = AF_INET;
@@ -185,8 +183,7 @@ int ctx_init(struct ctx *ctx) {
 
     ctx->sfd = socket(AF_INET, SOCK_DGRAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0);
     int optval = 1;
-    setsockopt(ctx->sfd, SOL_SOCKET, SO_REUSEPORT, (const void *)&optval,
-               sizeof(int));
+    setsockopt(ctx->sfd, SOL_SOCKET, SO_REUSEPORT, (const void *)&optval, sizeof(int));
     if (ctx->socket_receive_bufsize > 0) {
         log_debug("Got non-zero socket_receive_bufsize.  Setting SO_RCVBUF to %ld...", ctx->socket_receive_bufsize);
         setsockopt(ctx->sfd, SOL_SOCKET, SO_RCVBUF, &ctx->socket_receive_bufsize, sizeof(ctx->socket_receive_bufsize));

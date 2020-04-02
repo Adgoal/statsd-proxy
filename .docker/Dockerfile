@@ -1,14 +1,11 @@
 FROM alpine as builder
-RUN apk --update add alpine-sdk && \
-  apk add autoconf && \
-  apk add automake
+RUN apk --no-cache add cmake clang clang-dev make gcc g++ libc-dev linux-headers
 
 COPY . /app
 
 RUN cd /app && \
-  ./autogen.sh && \
-  ./configure && \
-  make
+    cmake -DCMAKE_BUILD_TYPE=Release && \
+    cmake --build .
 
 FROM alpine
 COPY --from=builder /app/statsd-proxy /usr/local/bin/statsd-proxy
