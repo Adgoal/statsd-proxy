@@ -17,5 +17,3 @@ COPY .docker/entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/usr/local/bin/statsd-proxy", "-f", "/etc/statsd-proxy.cfg"]
-
-EXPOSE 8125/udp
